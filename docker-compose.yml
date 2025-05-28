@@ -16,8 +16,24 @@ services:
     networks:
       - user-network
 
+  postgres-event:
+    image: postgres:15
+    container_name: postgres-event-service
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eventdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - eventdata:/var/lib/postgresql/data
+    networks:
+      - user-network
+
 volumes:
   pgdata:
+  eventdata:
 
 networks:
   user-network:
