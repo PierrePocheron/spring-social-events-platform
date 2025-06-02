@@ -5,6 +5,7 @@ import fr.pedro.user_service.entity.User;
 import fr.pedro.user_service.mapper.UserMapper;
 import fr.pedro.user_service.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,11 @@ public class UserService {
     public UserService(UserRepository repo) {
         this.repo = repo;
     }
+
+    public Optional<UserDTO> findById(Long id) {
+        return repo.findById(id).map(UserMapper::toDTO);
+    }
+
 
     public List<UserDTO> findAll() {
         return repo.findAll().stream()

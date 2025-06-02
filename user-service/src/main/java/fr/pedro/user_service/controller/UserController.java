@@ -1,10 +1,10 @@
 package fr.pedro.user_service.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 import fr.pedro.user_service.dto.UserDTO;
 import fr.pedro.user_service.service.UserService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,6 +20,14 @@ public class UserController {
     public List<UserDTO> getAll() {
         return service.findAll();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getById(@PathVariable Long id) {
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
     @PostMapping
     public UserDTO create(@RequestBody UserDTO dto) {
