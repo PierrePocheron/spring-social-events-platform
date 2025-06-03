@@ -1,11 +1,13 @@
-package fr.pedro.event_service;
+package fr.pedro.gateway_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EventServiceApplication {
+public class GatewayServiceApplication {
+
 	public static void main(String[] args) {
-		SpringApplication.run(EventServiceApplication.class, args);
+		SpringApplication.run(GatewayServiceApplication.class, args);
 	}
+
 }
