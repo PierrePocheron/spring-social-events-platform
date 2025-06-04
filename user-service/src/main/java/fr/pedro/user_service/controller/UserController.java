@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import fr.pedro.user_service.dto.UserDTO;
 import fr.pedro.user_service.service.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,7 +31,7 @@ public class UserController {
 
 
     @PostMapping
-    public UserDTO create(@RequestBody UserDTO dto) {
+    public UserDTO create(@RequestBody @Valid UserDTO dto) {
         return service.save(dto);
     }
 }

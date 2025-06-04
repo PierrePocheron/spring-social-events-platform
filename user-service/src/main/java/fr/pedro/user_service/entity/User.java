@@ -1,6 +1,8 @@
 package fr.pedro.user_service.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -16,8 +18,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String firstname;
+
+    @NotBlank
     private String lastname;
+
+    @NotBlank
+    @Email
     private String email;
 }
 
