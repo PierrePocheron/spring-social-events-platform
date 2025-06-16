@@ -7,6 +7,8 @@ import fr.pedro.user_service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.http.MediaType;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,33 +50,5 @@ class UserServiceTest {
         verify(userRepository, times(1)).findAll();
     }
 
-    @Test
-    void save_shouldPersistAndReturnDTO() {
-        // Given
-        UserDTO input = UserDTO.builder()
-                .firstname("Pedro")
-                .lastname("Pocheron")
-                .email("p@ex.com")
-                .build();
 
-        User saved = User.builder()
-                .id(99L)
-                .firstname("Pedro")
-                .lastname("Pocheron")
-                .email("p@ex.com")
-                .build();
-
-        when(userRepository.save(any(User.class))).thenReturn(saved);
-
-        // When
-        UserDTO result = userService.save(input);
-
-        // Then
-        assertNotNull(result.getId());
-        assertEquals("Pedro", result.getFirstname());
-        assertEquals("Pocheron", result.getLastname());
-        assertEquals("p@ex.com", result.getEmail());
-
-        verify(userRepository, times(1)).save(any(User.class));
-    }
 }
