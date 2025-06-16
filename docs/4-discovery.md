@@ -14,7 +14,7 @@ server:
 
 spring:
   application:
-    name: discovery-server
+    name: discovery-service
 
 eureka:
   client:

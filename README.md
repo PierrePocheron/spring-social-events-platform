@@ -23,24 +23,26 @@ L'objectif de ce projet est **d'apprendre à construire une architecture propre,
 ## 📚 Documentation
 
 Tout est expliqué étape par étape dans le dossier [`/docs`](./docs) :
+
 - [Étape 0 — Architecture générale](./docs/0-architecture.md)
 - Étape 1 à venir : User Service
 
 ## 🗺️ Services prévus
 
-| Microservice         | Description                                  |
-|----------------------|----------------------------------------------|
-| `user-service`       | Gestion des utilisateurs                     |
-| `event-service`      | Gestion des événements sociaux               |
+| Microservice            | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `user-service`          | Gestion des utilisateurs                    |
+| `event-service`         | Gestion des événements sociaux              |
 | `participation-service` | Inscription des utilisateurs aux événements |
-| `notification-service` | Envoi de mails/sms mockés                    |
-| `gateway-service`    | Point d'entrée unique (API Gateway)          |
-| `discovery-server`   | Enregistrement dynamique (Eureka)            |
-| `config-server`      | Configuration centralisée des services       |
+| `notification-service`  | Envoi de mails/sms mockés                   |
+| `gateway-service`       | Point d'entrée unique (API Gateway)         |
+| `discovery-service`     | Enregistrement dynamique (Eureka)           |
+| `config-server`         | Configuration centralisée des services      |
 
 ## 💡 Pour qui est ce projet ?
 
 Ce projet est à destination :
+
 - Des **développeurs Java débutants ou intermédiaires**
 - Des personnes souhaitant apprendre **Spring en architecture microservices**
 - De moi-même 😎, pour progresser proprement en design et en architecture logicielle

@@ -3,14 +3,13 @@ server:
 
 spring:
   application:
-    name: discovery-server
+    name: discovery-service
   jpa:
     enabled: false
   datasource:
     url: ""
     username: ""
     password: ""
-
 
 eureka:
   client:

@@ -1,21 +1,17 @@
+server:
+  port: 8082
+
 spring:
   application:
-    name: user-service
-
+    name: event-service
   datasource:
-    url: jdbc:postgresql://postgres:5432/userdb
+    url: jdbc:postgresql://postgres-event:5432/eventdb
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-  server:
-    port: 8081
 
 eureka:
   client:
