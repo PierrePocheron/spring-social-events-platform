@@ -6,6 +6,7 @@ import java.util.List;
 import fr.pedro.user_service.dto.UserDTO;
 import fr.pedro.user_service.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,7 +32,17 @@ public class UserController {
 
 
     @PostMapping
-    public UserDTO create(@RequestBody @Valid UserDTO dto) {
-        return service.save(dto);
+    public ResponseEntity<UserDTO> create(@RequestBody @Valid UserDTO dto) {
+        UserDTO savedUser =service.save(dto);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (!service.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

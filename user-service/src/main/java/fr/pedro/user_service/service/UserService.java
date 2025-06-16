@@ -23,6 +23,9 @@ public class UserService {
         return repo.findById(id).map(UserMapper::toDTO);
     }
 
+    public boolean existsById(Long id) {
+        return repo.existsById(id);
+    }
 
     public List<UserDTO> findAll() {
         return repo.findAll().stream()
@@ -33,5 +36,9 @@ public class UserService {
     public UserDTO save(UserDTO dto) {
         User saved = repo.save(UserMapper.toEntity(dto));
         return UserMapper.toDTO(saved);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
     }
 }
