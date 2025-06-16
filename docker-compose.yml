@@ -31,6 +31,19 @@ services:
     networks:
       - user-network
 
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres
+    networks:
+      - user-network
+
 volumes:
   pgdata:
   eventdata:
