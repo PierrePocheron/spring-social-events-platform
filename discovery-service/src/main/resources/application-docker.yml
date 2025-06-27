@@ -8,12 +8,3 @@ eureka:
     service-url:
       defaultZone: http://discovery-service:8761/eureka/
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus
-  metrics:
-    export:
-      prometheus:
-        enabled: true
