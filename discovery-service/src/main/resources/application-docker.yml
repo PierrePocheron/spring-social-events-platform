@@ -5,6 +5,15 @@ eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
-        service-url:
+    service-url:
       defaultZone: http://discovery-service:8761/eureka/
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
