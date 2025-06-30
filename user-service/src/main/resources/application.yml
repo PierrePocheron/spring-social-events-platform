@@ -1,6 +1,10 @@
 server:
   port: 8081
 
+app:
+  init:
+    dev-dataset: true
+
 spring:
   application:
     name: user-service
