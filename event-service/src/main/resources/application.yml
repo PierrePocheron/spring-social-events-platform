@@ -1,6 +1,10 @@
 server:
   port: 8082
 
+app:
+  init:
+    dev-dataset: true
+
 spring:
   application:
     name: event-service
