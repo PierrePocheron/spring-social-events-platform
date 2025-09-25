@@ -1,0 +1,42 @@
+name: DAST - OWASP ZAP
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24.0.0
+        options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start application with docker-compose (background)
+        run: |
+          docker-compose -f docker-compose.ci.yml up -d
+        # docker-compose.ci.yml : minimal compose to run your services for tests
+
+      - name: Wait for app to be ready
+        run: |
+          # une simple attente ; idéalement remplacer par healthcheck loop
+          for i in {1..30}; do
+            if curl -sSf http://localhost:8081/actuator/health; then
+              echo "user-service up"; break
+            fi
+            sleep 2
+          done
+
+      - name: Run ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.9.1
+        with:
+          target: 'http://localhost:8080'   # gateway
+          rules_file_name: ''
+          fail_on_alert: 'true'
+
+      - name: Tear down
+        if: always()
+        run: docker-compose -f docker-compose.ci.yml down -v
