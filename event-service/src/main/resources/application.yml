@@ -26,3 +26,16 @@ eureka:
 
 user-service:
   base-url: http://user-service:8081
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userClientCB:
+        sliding-window-size: 5          # évalue sur les 5 derniers appels
+        failure-rate-threshold: 50      # ouvre le circuit si 50%+ d'échecs
+        wait-duration-in-open-state: 10s # attend 10s avant de retenter
+        permitted-number-of-calls-in-half-open-state: 2
+  timelimiter:
+    instances:
+      userClientCB:
+        timeout-duration: 2s            # abandon si user-service répond pas en 2s

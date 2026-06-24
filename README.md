@@ -38,6 +38,14 @@ La documentation est organisée dans le dossier [`/docs`](./docs). Chaque étape
 
 ---
 
+## 📚 Ce qui est déjà en place
+
+![Schema archi](/docs/images/schema_archi.png)
+
+---
+
+
+
 ## 🧱 Microservices développés
 
 | Service              | Description                                  | Port  |
@@ -100,6 +108,7 @@ Ce projet est destiné :
 - À moi-même 😄 pour monter en compétence et me challenger
 
 ## 🧠 À venir
+- DevOps -> CI/CD -> GitHub actions -> Workflow -> Sonarcube / SonarCloud / CheckMarx
 - ✅ Tests end-to-end
 - 🧪 Configuration centralisée (Spring Config)
 - 🔐 Authentification (Keycloak ou JWT)
