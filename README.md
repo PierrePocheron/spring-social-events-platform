@@ -1,116 +1,122 @@
-# 🧩 Social Events Platform — Projet Microservices Java Spring
+# Spring Social Events Platform — Microservices Spring Boot
 
-Bienvenue sur **Social Events Platform**, mon projet d'entraînement complet autour des **microservices avec Spring Boot** ☕️⚙️
-
-L'objectif est de concevoir une architecture réaliste, propre, modulaire et évolutive, à la manière d'un vrai projet d'entreprise.
-Chaque service, composant, et intégration est **documenté en détail** pour faciliter l'apprentissage et la montée en compétence.
+Projet d'apprentissage complet autour des **microservices avec Spring Boot / Spring Cloud**, construit étape par étape avec une architecture de niveau production.
 
 ---
 
-## 🛠️ Tech Stack
+## Stack technique
 
-- **Java 17** + **Spring Boot 3**
-- Spring Cloud (Eureka, Gateway, Config Server)
-- PostgreSQL
-- Docker & Docker Compose
-- JUnit & Mockito
-- (À venir) GitHub Actions CI
-- (Bonus) Kafka, Keycloak, Angular ou React
-
----
-
-## 📚 Documentation complète
-
-La documentation est organisée dans le dossier [`/docs`](./docs). Chaque étape est numérotée et couvre un aspect clé du projet :
-
-| Étape | Sujet                                 | Fichier                              |
-|-------|---------------------------------------|--------------------------------------|
-| 0️⃣    | Architecture générale                 | [`0-architecture.md`](./docs/0-architecture.md) |
-| 1️⃣    | Service utilisateur (`user-service`)  | [`1-user-service.md`](./docs/1-user-service.md) |
-| 2️⃣    | Service événementiel (`event-service`)| [`2-event-service.md`](./docs/2-event-service.md) |
-| 3️⃣    | Intégration des services (Feign etc.)| [`3-user-event-integration.md`](./docs/3-user-event-integration.md) |
-| 4️⃣    | Découverte de services (Eureka)       | [`4-discovery.md`](./docs/4-discovery.md) |
-| 5️⃣    | API Gateway                           | [`5-gateway.md`](./docs/5-gateway.md) |
-| 6️⃣    | Dockerisation complète                | [`6-dockerisation.md`](./docs/6-dockerisation.md) |
-| 7️⃣    | Monitoring (Prometheus + Grafana)     | [`7-monitoring.md`](./docs/7-monitoring.md) |
-
-➡️ D'autres étapes viendront enrichir ce projet (tests end-to-end, CI/CD, auth, etc.)
+| Catégorie | Technologies |
+|---|---|
+| **Langage / Runtime** | Java 17, Spring Boot 3.5 |
+| **Microservices** | Spring Cloud Gateway, Spring Cloud Netflix Eureka, Spring Cloud Circuit Breaker |
+| **Résilience** | Resilience4j (Circuit Breaker, Timeout, Fallback) |
+| **Messaging** | Apache Kafka (mode KRaft, sans ZooKeeper) |
+| **Data** | PostgreSQL, Spring Data JPA, Hibernate |
+| **Observabilité** | Prometheus, Grafana, Micrometer, Spring Boot Actuator |
+| **Conteneurs** | Docker, Docker Compose (multi-stage Dockerfile) |
+| **CI/CD & DevSecOps** | GitHub Actions, SpotBugs + FindSecBugs, OWASP ZAP, Trivy, OWASP Dependency-Check, CycloneDX SBOM |
 
 ---
 
-## 📚 Ce qui est déjà en place
+## Microservices
 
-![Schema archi](/docs/images/schema_archi.png)
-
----
-
-
-
-## 🧱 Microservices développés
-
-| Service              | Description                                  | Port  |
-|----------------------|----------------------------------------------|--------|
-| `user-service`        | Gestion des utilisateurs                     | 8081   |
-| `event-service`       | Gestion des événements sociaux               | 8082   |
-| `gateway-service`     | API Gateway unique                           | 8080   |
-| `discovery-service`   | Enregistrement dynamique via Eureka         | 8761   |
-| (à venir) `config-server` | Configuration centralisée                  | 8888   |
-| (à venir) `participation-service` | Gestion des inscriptions aux événements | TBD    |
-| (à venir) `notification-service`  | Simulation d'envoi de mails/SMS       | TBD    |
+| Service | Rôle | Port |
+|---|---|---|
+| `gateway-service` | Point d'entrée unique — routage, load balancing | 8080 |
+| `discovery-service` | Registre dynamique des services (Eureka) | 8761 |
+| `user-service` | Gestion des utilisateurs | 8081 |
+| `event-service` | Gestion des événements, publication Kafka | 8082 |
+| `notification-service` | Consommateur Kafka — notifications | 8083 |
 
 ---
 
-## 🚀 Lancer le projet en local (avec Docker)
-
-> **Prérequis :**
-> - [Docker](https://www.docker.com/products/docker-desktop) installé
-> - Les ports 8080, 8081, 8082, 8761... doivent être libres
-
-### ✅ Étapes
+## Lancer le projet
 
 ```bash
-# 1. Depuis la racine du projet
-docker compose down -v  # (optionnel) Nettoie les volumes existants
+# Démarrage complet (build + run)
 docker compose up --build
+
+# Nettoyer les volumes (Kafka, Postgres) avant de repartir propre
+docker compose down -v && docker compose up --build
 ```
 
+**Endpoints principaux (via gateway) :**
+- `GET  http://localhost:8080/api/users`
+- `POST http://localhost:8080/api/users`
+- `GET  http://localhost:8080/api/events`
+- `POST http://localhost:8080/api/events`
+- `GET  http://localhost:8082/actuator/health`
 
-## 🧪 Mode développeur
+**Monitoring :**
+- Prometheus : http://localhost:9090
+- Grafana : http://localhost:3000 (`admin / admin`)
+- Eureka dashboard : http://localhost:8761
 
-Pour activer des données de test :
+---
 
-```yaml
-# application-docker.yml (dans chaque service)
-app:
-  init:
-    dev-data: true
+## Architecture
+
+```
+                    Client HTTP
+                         │
+              ┌──────────▼──────────┐
+              │  API Gateway :8080   │   Spring Cloud Gateway
+              │  routing, LB         │
+              └──────┬──────────┬───┘
+                     │          │
+            /api/users/**   /api/events/**
+                     │          │
+          ┌──────────▼┐   ┌─────▼──────────┐
+          │user-service│   │ event-service   │
+          │  :8081     │◄──│  :8082          │  RestTemplate + Circuit Breaker
+          └──────┬─────┘   └──────┬──────────┘
+                 │                │  publishes
+          [postgres              [postgres      [Kafka KRaft :9092]
+           :5432]                 :5433]              │
+                                                      │ consumes
+                                            ┌─────────▼──────────┐
+                                            │ notification-service │
+                                            │  :8083               │
+                                            └──────────────────────┘
+
+  Transverse : Eureka (découverte) · Prometheus + Grafana (métriques) · Actuator (health)
 ```
 
-Les services injecteront automatiquement un mini-jeu de données cohérent (utilisateurs + événements liés).
+---
 
-## 📈 Suivi, tests, monitoring
-- Les logs de chaque service sont accessibles via docker logs.
-- Le monitoring Prometheus / Grafana est documenté dans 7-monitoring.md.
-- Les tests unitaires sont présents dans chaque microservice.
-- Les tests end-to-end sont prévus dans une prochaine itération.
+## Documentation
 
-## 🤝 Objectifs pédagogiques
-- 🎯 Apprendre à construire une architecture réaliste et scalable avec Spring Boot
-- 🧠 Comprendre les concepts de microservices, gateway, service discovery, communication Feign
-- 📦 Mettre en place une infrastructure Dockerisée prête à déployer
-- 📚 Rédiger une documentation claire comme dans un vrai projet pro
-- 🧪 Explorer les sujets avancés (monitoring, auth, CI/CD…)
+| # | Sujet | Fichier |
+|---|---|---|
+| 0 | Architecture générale | [`docs/0-architecture.md`](./docs/0-architecture.md) |
+| 1 | user-service | [`docs/1-user-service.md`](./docs/1-user-service.md) |
+| 2 | event-service | [`docs/2-event-service.md`](./docs/2-event-service.md) |
+| 3 | Intégration inter-services | [`docs/3-user-event-integration.md`](./docs/3-user-event-integration.md) |
+| 4 | Service discovery (Eureka) | [`docs/4-discovery.md`](./docs/4-discovery.md) |
+| 5 | API Gateway | [`docs/5-gateway.md`](./docs/5-gateway.md) |
+| 6 | Dockerisation | [`docs/6-dockerisation.md`](./docs/6-dockerisation.md) |
+| 7 | Monitoring (Prometheus + Grafana) | [`docs/7-monitoring.md`](./docs/7-monitoring.md) |
+| 8 | Résilience (Resilience4j) | [`docs/8-resilience4j.md`](./docs/8-resilience4j.md) |
+| 9 | Messaging asynchrone (Kafka) | [`docs/9-kafka.md`](./docs/9-kafka.md) |
 
-## 💡 Pour qui est ce projet ?
-Ce projet est destiné :
-- Aux développeurs Java débutants ou intermédiaires
-- À toute personne souhaitant pratiquer Spring Boot dans un cadre réaliste
-- À moi-même 😄 pour monter en compétence et me challenger
+---
 
-## 🧠 À venir
-- DevOps -> CI/CD -> GitHub actions -> Workflow -> Sonarcube / SonarCloud / CheckMarx
-- ✅ Tests end-to-end
-- 🧪 Configuration centralisée (Spring Config)
-- 🔐 Authentification (Keycloak ou JWT)
-- 📦 Déploiement cloud (Kubernetes / Swarm)
-- 🌍 Frontend Angular / React
+## CI/CD & DevSecOps (GitHub Actions)
+
+| Workflow | Outil | Type |
+|---|---|---|
+| `maven-ci.yml` | Maven + SpotBugs + FindSecBugs | Build + SAST |
+| `container-scan.yml` | Trivy | Scan image Docker |
+| `oast-zap.yml` | OWASP ZAP | DAST |
+| `codeql-analysis.yml` | CodeQL | Analyse de code |
+| `depandabot.yml` | Dependabot | Mises à jour de dépendances |
+
+---
+
+## À venir
+
+- Kubernetes — Deployment, Service, ConfigMap, Secret, Ingress, probes Actuator, HPA
+- Distributed tracing — OpenTelemetry + Tempo (3e pilier de l'observabilité)
+- Authentification — JWT ou Keycloak
+- Config Server — Spring Cloud Config

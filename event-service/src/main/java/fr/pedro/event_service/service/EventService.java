@@ -2,6 +2,8 @@ package fr.pedro.event_service.service;
 
 import fr.pedro.event_service.dto.EventDTO;
 import fr.pedro.event_service.entity.Event;
+import fr.pedro.event_service.kafka.EventCreatedEvent;
+import fr.pedro.event_service.kafka.EventProducer;
 import fr.pedro.event_service.mapper.EventMapper;
 import fr.pedro.event_service.repository.EventRepository;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ public class EventService {
 
     private final EventRepository repo;
     private final UserClient userClient;
+    private final EventProducer eventProducer;
 
     public List<EventDTO> getAll() {
         return repo.findAll().stream()
@@ -28,6 +31,12 @@ public class EventService {
             throw new IllegalArgumentException("Organizer ID does not exist in user-service.");
         }
         Event saved = repo.save(EventMapper.toEntity(dto));
+        eventProducer.publishEventCreated(new EventCreatedEvent(
+                saved.getId(),
+                saved.getTitle(),
+                saved.getOrganizerId(),
+                saved.getDate()
+        ));
         return EventMapper.toDTO(saved);
     }
 }

@@ -12,7 +12,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    
+  kafka:
+    bootstrap-servers: kafka:9092
+
 user-service:
   base-url: http://user-service:8081
 
@@ -47,3 +49,4 @@ resilience4j:
     instances:
       userClientCB:
         timeout-duration: 2s            # abandon si user-service répond pas en 2s
+
