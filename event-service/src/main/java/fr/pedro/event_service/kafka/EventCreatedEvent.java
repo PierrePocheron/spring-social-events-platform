@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public record EventCreatedEvent(
   Long eventId,
   String title,
-  String organisezId,
+  String organizerId,
   LocalDate date
 ) {
 

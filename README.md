@@ -8,7 +8,7 @@ Projet d'apprentissage complet autour des **microservices avec Spring Boot / Spr
 
 | Catégorie | Technologies |
 |---|---|
-| **Langage / Runtime** | Java 17, Spring Boot 3.5 |
+| **Langage / Runtime** | Java 21, Spring Boot 4.1 |
 | **Microservices** | Spring Cloud Gateway, Spring Cloud Netflix Eureka, Spring Cloud Circuit Breaker |
 | **Résilience** | Resilience4j (Circuit Breaker, Timeout, Fallback) |
 | **Messaging** | Apache Kafka (mode KRaft, sans ZooKeeper) |

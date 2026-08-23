@@ -7,15 +7,17 @@ spring:
 
   cloud:
     gateway:
-      routes:
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/users/**
-        - id: event-service
-          uri: lb://event-service
-          predicates:
-            - Path=/api/events/**
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+            - id: event-service
+              uri: lb://event-service
+              predicates:
+                - Path=/api/events/**
 
 eureka:
   client:
@@ -26,7 +28,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info,prometheus,gateway
+  endpoint:
+    gateway:
+      access: unrestricted
   metrics:
     export:
       prometheus:
