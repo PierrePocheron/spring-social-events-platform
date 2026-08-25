@@ -8,7 +8,7 @@ Projet d'apprentissage complet autour des **microservices avec Spring Boot / Spr
 
 | Catégorie | Technologies |
 |---|---|
-| **Langage / Runtime** | Java 17, Spring Boot 3.5 |
+| **Langage / Runtime** | Java 21, Spring Boot 4.1 |
 | **Microservices** | Spring Cloud Gateway, Spring Cloud Netflix Eureka, Spring Cloud Circuit Breaker |
 | **Résilience** | Resilience4j (Circuit Breaker, Timeout, Fallback) |
 | **Messaging** | Apache Kafka (mode KRaft, sans ZooKeeper) |
@@ -57,30 +57,46 @@ docker compose down -v && docker compose up --build
 
 ## Architecture
 
-```
-                    Client HTTP
-                         │
-              ┌──────────▼──────────┐
-              │  API Gateway :8080   │   Spring Cloud Gateway
-              │  routing, LB         │
-              └──────┬──────────┬───┘
-                     │          │
-            /api/users/**   /api/events/**
-                     │          │
-          ┌──────────▼┐   ┌─────▼──────────┐
-          │user-service│   │ event-service   │
-          │  :8081     │◄──│  :8082          │  RestTemplate + Circuit Breaker
-          └──────┬─────┘   └──────┬──────────┘
-                 │                │  publishes
-          [postgres              [postgres      [Kafka KRaft :9092]
-           :5432]                 :5433]              │
-                                                      │ consumes
-                                            ┌─────────▼──────────┐
-                                            │ notification-service │
-                                            │  :8083               │
-                                            └──────────────────────┘
+```mermaid
+graph TD
+    Client(["🌐 Client HTTP"])
 
-  Transverse : Eureka (découverte) · Prometheus + Grafana (métriques) · Actuator (health)
+    subgraph Gateway["API Layer"]
+        GW["Gateway Service :8080\nSpring Cloud Gateway · WebFlux"]
+    end
+
+    subgraph Services["Business Services"]
+        US["User Service :8081\nSpring MVC · JPA · Virtual Threads"]
+        ES["Event Service :8082\nSpring MVC · JPA · Kafka · Circuit Breaker"]
+        NS["Notification Service :8083\nSpring MVC · Kafka Consumer"]
+    end
+
+    subgraph Infra["Infrastructure"]
+        DISC["Discovery Service :8761\nEureka Server"]
+        UDB[("PostgreSQL\nuserdb :5432")]
+        EDB[("PostgreSQL\neventdb :5433")]
+        KAFKA[("Kafka :9092\nKRaft mode")]
+    end
+
+    subgraph Obs["Observabilité"]
+        PROM["Prometheus :9090"]
+        GRAF["Grafana :3000"]
+    end
+
+    Client --> GW
+    GW -->|"lb://user-service"| US
+    GW -->|"lb://event-service"| ES
+    GW -.->|"service discovery"| DISC
+    US -.->|"register"| DISC
+    ES -.->|"register"| DISC
+    ES -->|"HTTP + CircuitBreaker"| US
+    US --- UDB
+    ES --- EDB
+    ES -->|"publishes EventCreated"| KAFKA
+    KAFKA -->|"consumes"| NS
+    US -.->|"/actuator/prometheus"| PROM
+    ES -.->|"/actuator/prometheus"| PROM
+    PROM --- GRAF
 ```
 
 ---
